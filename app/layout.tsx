@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Figtree } from "next/font/google";
 import Link from "next/link";
+import { Footer } from "./footer";
 import { Navigation } from "./navigation";
 import "./globals.css";
 
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <Navigation />
           </header>
           {children}
+          <Footer />
         </div>
       </body>
     </html>
