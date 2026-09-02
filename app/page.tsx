@@ -41,17 +41,33 @@ export default function Home() {
             <p className="copy-text">Designing products that turn interaction into experience.</p>
             <p>
               <span className="copy-text">
-                Clients include <strong>Netstone</strong> &amp; <strong>Cyrrus</strong>.
-                Previously at <strong>Concept7</strong> &amp;{" "}
-                <strong>De Voorhoede</strong>.{" "}
+                Clients include{" "}
+                <a href="https://netstone.nl/" target="_blank" rel="noreferrer">
+                  <strong>Netstone</strong>
+                </a>{" "}
+                &amp; <strong>Cyrrus</strong>. Previously at{" "}
+                <a href="https://concept7.nl/" target="_blank" rel="noreferrer">
+                  <strong>Concept7</strong>
+                </a>{" "}
+                &amp;{" "}
+                <a
+                  href="https://www.voorhoede.nl/nl/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <strong>De Voorhoede</strong>
+                </a>.{" "}
               </span>
-              <span className="contact-cta" tabIndex={0} role="button">
+              <span className="contact-cta">
                 <span className="contact-mark" aria-hidden="true">
                   <span className="contact-halo" />
                   <span className="contact-dot" />
                 </span>
                 <span className="contact-label">
-                  Working on something cool? Get in touch!
+                  Building something exciting?{" "}
+                  <a href="mailto:claudiobakker@gmail.com" className="contact-link">
+                    <strong>Let’s talk!</strong>
+                  </a>
                 </span>
               </span>
             </p>
