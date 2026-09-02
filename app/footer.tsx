@@ -44,14 +44,6 @@ function AmsterdamTime() {
 }
 
 export function Footer() {
-  const [copied, setCopied] = useState(false);
-
-  async function copyEmail() {
-    await navigator.clipboard.writeText(email);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1800);
-  }
-
   return (
     <footer className="site-footer">
       <div className="footer-identity">
@@ -70,14 +62,19 @@ export function Footer() {
 
       <div className="footer-contact">
         <p>Let&apos;s work together!</p>
-        <button
-          type="button"
-          onClick={copyEmail}
+        <a
+          href={`mailto:${email}`}
           className="copy-email"
-          aria-live="polite"
         >
-          {copied ? "Copied!" : email}
-        </button>
+          <span>{email}</span>
+          <svg
+            className="email-arrow"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path d="M7 17 17 7M8 7h9v9" />
+          </svg>
+        </a>
         <div className="social-links">
           <a
             href="https://www.linkedin.com/in/claudiobakker/"

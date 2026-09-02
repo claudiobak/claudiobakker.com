@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 const links = [
   { label: "Work", href: "/" },
@@ -11,6 +12,7 @@ const links = [
 
 export function Navigation() {
   const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
   const activeIndex = Math.max(
     links.findIndex(({ href }) =>
       href === "/" ? pathname === href : pathname.startsWith(href),
@@ -19,22 +21,40 @@ export function Navigation() {
   );
 
   return (
-    <nav className="navigation" aria-label="Main navigation">
-      <span
-        className="navigation-indicator"
-        style={{ transform: `translateX(${activeIndex * 100}%)` }}
-        aria-hidden="true"
-      />
-      {links.map(({ label, href }, index) => (
-        <Link
-          key={href}
-          href={href}
-          className="navigation-link"
-          aria-current={index === activeIndex ? "page" : undefined}
-        >
-          {label}
-        </Link>
-      ))}
-    </nav>
+    <div className="navigation-shell">
+      <button
+        type="button"
+        className={`menu-toggle${isOpen ? " is-open" : ""}`}
+        aria-expanded={isOpen}
+        aria-controls="main-navigation"
+        aria-label={isOpen ? "Close menu" : "Open menu"}
+        onClick={() => setIsOpen((open) => !open)}
+      >
+        <span />
+        <span />
+      </button>
+      <nav
+        id="main-navigation"
+        className={`navigation${isOpen ? " is-open" : ""}`}
+        aria-label="Main navigation"
+      >
+        <span
+          className="navigation-indicator"
+          style={{ transform: `translateX(${activeIndex * 100}%)` }}
+          aria-hidden="true"
+        />
+        {links.map(({ label, href }, index) => (
+          <Link
+            key={href}
+            href={href}
+            className="navigation-link"
+            aria-current={index === activeIndex ? "page" : undefined}
+            onClick={() => setIsOpen(false)}
+          >
+            {label}
+          </Link>
+        ))}
+      </nav>
+    </div>
   );
 }
