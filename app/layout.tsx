@@ -9,7 +9,7 @@ import "./globals.css";
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-figtree" });
 
 export const metadata: Metadata = {
-  title: "Claudio Bakker — Product Designer",
+  title: "Claudio Bakker | Product Designer + Developer",
   description: "The portfolio of Claudio Bakker, a product designer who codes.",
 };
 
