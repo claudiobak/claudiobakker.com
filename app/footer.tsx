@@ -56,8 +56,8 @@ export function Footer() {
 
       <nav className="footer-navigation" aria-label="Footer navigation">
         <Link href="/">Work</Link>
-        <Link href="/art">Art</Link>
         <Link href="/about">About</Link>
+        <Link href="/resume">Resume</Link>
       </nav>
 
       <div className="footer-contact">
