@@ -7,7 +7,7 @@ import { useState } from "react";
 const links = [
   { label: "Work", href: "/" },
   { label: "About", href: "/about" },
-  { label: "Resume", href: "/resume" },
+  { label: "Resume", href: "/Claudio-Bakker-CV.pdf" },
 ];
 
 export function Navigation() {
@@ -49,6 +49,9 @@ export function Navigation() {
             href={href}
             className="navigation-link"
             aria-current={index === activeIndex ? "page" : undefined}
+            target={label === "Resume" ? "_blank" : undefined}
+            rel={label === "Resume" ? "noopener noreferrer" : undefined}
+            prefetch={label === "Resume" ? false : undefined}
             onClick={() => setIsOpen(false)}
           >
             {label}
