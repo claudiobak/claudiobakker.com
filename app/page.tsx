@@ -41,8 +41,8 @@ export default function Home() {
             <p className="copy-text">Designing products that turn interaction into experience.</p>
             <p>
               <span className="copy-text">
-                Clients include <strong>Netstone</strong>, <strong>Cyrrus</strong> &amp;{" "}
-                <strong>Onix</strong>. Previously at <strong>Concept7</strong> &amp;{" "}
+                Clients include <strong>Netstone</strong> &amp; <strong>Cyrrus</strong>.
+                Previously at <strong>Concept7</strong> &amp;{" "}
                 <strong>De Voorhoede</strong>.{" "}
               </span>
               <span className="contact-cta" tabIndex={0} role="button">
