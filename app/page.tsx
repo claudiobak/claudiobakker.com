@@ -33,7 +33,7 @@ export default function Home() {
       <section className="hero" aria-labelledby="hero-title">
         <h1 id="hero-title">
           I’m Claudio, a product
-          <br />
+          <br className="hero-title-break" />
           designer who codes.
         </h1>
         <div className="hero-copy">
@@ -60,7 +60,7 @@ export default function Home() {
       </section>
       <section className="projects" aria-label="Selected work">
         <div className="project-grid">
-          {projects.map((project) => (
+          {projects.map((project, index) => (
             <article className="project-card" key={project.company}>
               <div className="project-cover">
                 <Image
@@ -69,6 +69,8 @@ export default function Home() {
                   width={678}
                   height={368}
                   sizes="(max-width: 720px) 100vw, 50vw"
+                  priority={index === 0}
+                  unoptimized
                 />
                 <p className="project-label">
                   <span>{project.company}</span>
