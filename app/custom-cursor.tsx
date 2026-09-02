@@ -21,11 +21,13 @@ export function CustomCursor() {
 
       const target = event.target as Element | null;
       const isProject = Boolean(target?.closest(".project-card"));
+      const isCreature = Boolean(target?.closest(".creature-walker"));
       cursor.classList.toggle(
         "is-interactive",
         Boolean(target?.closest("a, button, [role='button']")),
       );
       cursor.classList.toggle("is-project", isProject);
+      cursor.classList.toggle("is-creature", isCreature);
     };
 
     const hideCursor = () => cursor.classList.remove("is-visible");

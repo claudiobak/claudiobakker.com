@@ -49,19 +49,24 @@ function AmsterdamTime() {
 }
 
 export function Footer() {
-  const [creatureMessage, setCreatureMessage] = useState<string | null>(null);
-  const [hoverMessage, setHoverMessage] = useState<string | null>(null);
-  const [pokeMessage, setPokeMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const walkerRef = useRef<HTMLDivElement>(null);
   const dragOffset = useRef({ x: 0, y: 0 });
+  const isPointerDown = useRef(false);
   const isDragging = useRef(false);
   const wasReturning = useRef(false);
   const lastGreeting = useRef(-1);
   const dragStart = useRef({ x: 0, y: 0 });
   const didDrag = useRef(false);
-  const pokeTimer = useRef<number | undefined>(undefined);
+  const messageTimer = useRef<number | undefined>(undefined);
   const pokeInFlight = useRef(false);
+  const messageMode = useRef<"idle" | "hover" | "poke" | "drop">("idle");
+  const hasShownPokeCount = useRef(false);
+  const lastPokeReaction = useRef(-1);
+  const pokeReactionQueue = useRef<number[]>([]);
+  const lastDropReaction = useRef(-1);
+  const dropReactionQueue = useRef<number[]>([]);
 
   const ordinal = (count: number) => {
     const remainder = count % 100;
@@ -79,7 +84,12 @@ export function Footer() {
     return `${count}${suffix}`;
   };
 
-  const greetVisitor = () => {
+  const greetVisitor = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== "mouse") return;
+    if (messageMode.current !== "idle" && messageMode.current !== "hover") {
+      return;
+    }
+
     const greetings = ["oh hey!", "hello there!", "you found me!", "hi!"];
     let nextGreeting = Math.floor(Math.random() * greetings.length);
 
@@ -88,7 +98,16 @@ export function Footer() {
     }
 
     lastGreeting.current = nextGreeting;
-    setHoverMessage(greetings[nextGreeting]);
+    messageMode.current = "hover";
+    if (messageTimer.current) window.clearTimeout(messageTimer.current);
+    setMessage(greetings[nextGreeting]);
+  };
+
+  const stopGreeting = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== "mouse") return;
+    if (messageMode.current !== "hover") return;
+    messageMode.current = "idle";
+    setMessage(null);
   };
 
   const pokeCreature = async () => {
@@ -99,7 +118,8 @@ export function Footer() {
     if (pokeInFlight.current) return;
 
     pokeInFlight.current = true;
-    setPokeMessage("ouch!");
+    messageMode.current = "poke";
+    if (messageTimer.current) window.clearTimeout(messageTimer.current);
 
     const storedCount = Number.parseInt(
       window.localStorage.getItem("creature-poke-count") ?? "0",
@@ -107,44 +127,114 @@ export function Footer() {
     );
     const fallbackCount = Number.isNaN(storedCount) ? 1 : storedCount + 1;
 
+    const showPokeResult = (count: number) => {
+      if (!hasShownPokeCount.current) {
+        hasShownPokeCount.current = true;
+        setMessage(`this is the ${ordinal(count)} time I've been poked :(`);
+        return;
+      }
+
+      const reactions = [
+        "again?",
+        "enough.",
+        "stop that.",
+        "rude.",
+        "ow! stop.",
+        "ow.",
+        "hey!",
+        "was that necessary?",
+        "personal space?",
+        "I felt that.",
+        "not again.",
+        "seriously?",
+        "I'm trying to walk here.",
+        "you're enjoying this, aren't you?",
+        "Claudio, help.",
+        "one more time...",
+        "excuse me?",
+        "please don't.",
+        "what did I do?",
+        "can I help you?",
+        "that tickles.",
+        "we need to talk.",
+        "I have feelings, you know.",
+        "okay, that's enough.",
+        "my lawyer will hear about this.",
+        "reported.",
+      ];
+      if (pokeReactionQueue.current.length === 0) {
+        const queue = reactions.map((_, index) => index);
+        for (let index = queue.length - 1; index > 0; index -= 1) {
+          const randomIndex = Math.floor(Math.random() * (index + 1));
+          [queue[index], queue[randomIndex]] = [queue[randomIndex], queue[index]];
+        }
+
+        if (
+          queue.length > 1 &&
+          queue[queue.length - 1] === lastPokeReaction.current
+        ) {
+          [queue[0], queue[queue.length - 1]] = [
+            queue[queue.length - 1],
+            queue[0],
+          ];
+        }
+        pokeReactionQueue.current = queue;
+      }
+
+      const nextReaction = pokeReactionQueue.current.pop() ?? 0;
+      lastPokeReaction.current = nextReaction;
+      setMessage(reactions[nextReaction]);
+    };
+
     try {
-      const response = await fetch("/api/poke", { method: "POST" });
+      const response = await fetch("/api/poke", {
+        method: "POST",
+        signal: AbortSignal.timeout(4000),
+      });
       if (!response.ok) throw new Error("Global counter unavailable");
 
       const data = (await response.json()) as { count?: number };
       if (typeof data.count !== "number") throw new Error("Invalid counter");
 
       window.localStorage.setItem("creature-poke-count", String(data.count));
-      setPokeMessage(
-        `this is the ${ordinal(data.count)} time someone has poked me :(`,
-      );
+      showPokeResult(data.count);
     } catch {
       window.localStorage.setItem("creature-poke-count", String(fallbackCount));
-      setPokeMessage(
-        `this is the ${ordinal(fallbackCount)} time you've poked me :(`,
-      );
+      showPokeResult(fallbackCount);
     } finally {
       pokeInFlight.current = false;
-      if (pokeTimer.current) window.clearTimeout(pokeTimer.current);
-      pokeTimer.current = window.setTimeout(() => setPokeMessage(null), 3200);
+      messageTimer.current = window.setTimeout(() => {
+        messageMode.current = "idle";
+        setMessage(null);
+      }, 3200);
     }
   };
 
   useEffect(() => {
     const messages = [
-      "ouch!",
-      "hmm, interesting.",
-      "still scrolling?",
-      "nice choice!",
-      "almost there...",
+      "just passing through.",
+      "don't mind me.",
+      "where was I?",
+      "taking the scenic route.",
+      "this counts as cardio.",
+      "wonder what's over there.",
+      "another lap, then.",
+      "nice portfolio.",
+      "back and forth…",
+      "got places to be.",
+      "what a long page.",
+      "still going.",
+      "left, right, left…",
+      "I like it here.",
     ];
     let messageIndex = 0;
-    let hideTimer: number | undefined;
-
     const showMessage = () => {
-      setCreatureMessage(messages[messageIndex % messages.length]);
+      if (messageMode.current !== "idle" || isPointerDown.current) return;
+
+      setMessage(messages[messageIndex % messages.length]);
       messageIndex += 1;
-      hideTimer = window.setTimeout(() => setCreatureMessage(null), 2400);
+      if (messageTimer.current) window.clearTimeout(messageTimer.current);
+      messageTimer.current = window.setTimeout(() => setMessage(null), 2400);
     };
 
     const firstMessage = window.setTimeout(showMessage, 3000);
@@ -152,8 +242,7 @@ export function Footer() {
 
     return () => {
       window.clearTimeout(firstMessage);
-      if (hideTimer) window.clearTimeout(hideTimer);
-      if (pokeTimer.current) window.clearTimeout(pokeTimer.current);
+      if (messageTimer.current) window.clearTimeout(messageTimer.current);
       window.clearInterval(messageLoop);
     };
   }, []);
@@ -176,30 +265,35 @@ export function Footer() {
     };
     dragStart.current = { x: event.clientX, y: event.clientY };
     didDrag.current = false;
-    isDragging.current = true;
-    walker.style.animation = "none";
-    walker.style.removeProperty("--creature-delay");
-    walker.style.position = "fixed";
-    walker.style.left = `${walkerBounds.left}px`;
-    walker.style.top = `${walkerBounds.top}px`;
-    walker.style.bottom = "auto";
-    walker.classList.add("is-dragging");
+    isPointerDown.current = true;
     event.currentTarget.setPointerCapture(event.pointerId);
   };
 
   const dragCreature = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!isDragging.current) return;
+    if (!isPointerDown.current) return;
     const walker = walkerRef.current;
     if (!walker) return;
 
-    if (
+    const moved =
       Math.hypot(
         event.clientX - dragStart.current.x,
         event.clientY - dragStart.current.y,
-      ) > 5
-    ) {
+      ) > 5;
+
+    if (moved && !isDragging.current) {
+      const walkerBounds = walker.getBoundingClientRect();
       didDrag.current = true;
+      isDragging.current = true;
+      walker.style.animation = "none";
+      walker.style.removeProperty("--creature-delay");
+      walker.style.position = "fixed";
+      walker.style.left = `${walkerBounds.left}px`;
+      walker.style.top = `${walkerBounds.top}px`;
+      walker.style.bottom = "auto";
+      walker.classList.add("is-dragging");
     }
+
+    if (!isDragging.current) return;
 
     const x = Math.min(
       window.innerWidth - walker.offsetWidth,
@@ -215,6 +309,12 @@ export function Footer() {
   };
 
   const dropCreature = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!isPointerDown.current) return;
+    isPointerDown.current = false;
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
     if (!isDragging.current) return;
     isDragging.current = false;
 
@@ -222,9 +322,6 @@ export function Footer() {
     const track = trackRef.current;
     if (!walker || !track) return;
 
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
     walker.classList.remove("is-dragging");
     walker.classList.add("is-dropping");
     walker.style.top = `${window.innerHeight - walker.offsetHeight}px`;
@@ -232,8 +329,16 @@ export function Footer() {
     window.setTimeout(() => {
       const trackBounds = track.getBoundingClientRect();
       const trackWidth = trackBounds.width;
-      const start = Math.min(72, Math.max(0, trackWidth - 52));
-      const end = Math.max(start + 1, trackWidth - 124);
+      const isVerySmallScreen = window.matchMedia("(max-width: 480px)").matches;
+      const sideInset = isVerySmallScreen ? 8 : 72;
+      const start = Math.min(
+        sideInset,
+        Math.max(0, trackWidth - walker.offsetWidth - 4),
+      );
+      const end = Math.max(
+        start + 1,
+        trackWidth - walker.offsetWidth - sideInset,
+      );
       const viewportX = Number.parseFloat(walker.style.left) || trackBounds.left + start;
       const currentX = Math.min(end, Math.max(start, viewportX - trackBounds.left));
       const horizontalProgress = (currentX - start) / (end - start);
@@ -247,7 +352,64 @@ export function Footer() {
       walker.style.top = "";
       walker.style.bottom = "";
       walker.style.animation = "";
-      walker.style.setProperty("--creature-delay", `${-progress * 26}s`);
+      const travelDuration = window.matchMedia("(max-width: 480px)").matches
+        ? 12
+        : window.matchMedia("(max-width: 720px)").matches
+          ? 18
+          : 26;
+      walker.style.setProperty(
+        "--creature-delay",
+        `${-progress * travelDuration}s`,
+      );
+
+      const reactions = [
+        "big world, huh?",
+        "phew.",
+        "okay, okay.",
+        "thanks, I guess.",
+        "back to it.",
+        "gravity wins again.",
+        "nailed the landing.",
+        "I meant to do that.",
+        "where am I?",
+        "well, that happened.",
+        "back on my feet.",
+        "you could've put me down gently.",
+        "solid ground.",
+        "what a trip.",
+        "everything still attached?",
+        "I can walk from here.",
+        "weee—oh.",
+        "that was actually kind of fun.",
+      ];
+      if (dropReactionQueue.current.length === 0) {
+        const queue = reactions.map((_, index) => index);
+        for (let index = queue.length - 1; index > 0; index -= 1) {
+          const randomIndex = Math.floor(Math.random() * (index + 1));
+          [queue[index], queue[randomIndex]] = [queue[randomIndex], queue[index]];
+        }
+
+        if (
+          queue.length > 1 &&
+          queue[queue.length - 1] === lastDropReaction.current
+        ) {
+          [queue[0], queue[queue.length - 1]] = [
+            queue[queue.length - 1],
+            queue[0],
+          ];
+        }
+        dropReactionQueue.current = queue;
+      }
+
+      const nextReaction = dropReactionQueue.current.pop() ?? 0;
+      lastDropReaction.current = nextReaction;
+      messageMode.current = "drop";
+      if (messageTimer.current) window.clearTimeout(messageTimer.current);
+      setMessage(reactions[nextReaction]);
+      messageTimer.current = window.setTimeout(() => {
+        messageMode.current = "idle";
+        setMessage(null);
+      }, 2400);
     }, 1160);
   };
 
@@ -265,7 +427,13 @@ export function Footer() {
       <nav className="footer-navigation" aria-label="Footer navigation">
         <Link href="/">Work</Link>
         <Link href="/about">About</Link>
-        <Link href="/resume">Resume</Link>
+        <a
+          href="/Claudio-Bakker-CV.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Resume
+        </a>
       </nav>
 
       <div className="footer-contact">
@@ -314,13 +482,13 @@ export function Footer() {
           onPointerUp={dropCreature}
           onPointerCancel={dropCreature}
           onPointerEnter={greetVisitor}
-          onPointerLeave={() => setHoverMessage(null)}
+          onPointerLeave={stopGreeting}
           onClick={pokeCreature}
         >
           <span
-            className={`creature-message${pokeMessage || hoverMessage || creatureMessage ? " is-visible" : ""}`}
+            className={`creature-message${message ? " is-visible" : ""}`}
           >
-            {pokeMessage || hoverMessage || creatureMessage}
+            {message}
           </span>
           <div className="creature">
             <span className="creature-body">
