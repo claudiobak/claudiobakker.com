@@ -94,6 +94,8 @@ export function Footer() {
           </a>
         </div>
       </div>
+
+      <p className="footer-credit">Designed + coded by Claudio</p>
     </footer>
   );
 }
