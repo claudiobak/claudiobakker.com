@@ -1,7 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 
 const email = "claudiobakker@gmail.com";
 
@@ -44,6 +49,208 @@ function AmsterdamTime() {
 }
 
 export function Footer() {
+  const [creatureMessage, setCreatureMessage] = useState<string | null>(null);
+  const [hoverMessage, setHoverMessage] = useState<string | null>(null);
+  const [pokeMessage, setPokeMessage] = useState<string | null>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const walkerRef = useRef<HTMLDivElement>(null);
+  const dragOffset = useRef({ x: 0, y: 0 });
+  const isDragging = useRef(false);
+  const wasReturning = useRef(false);
+  const lastGreeting = useRef(-1);
+  const dragStart = useRef({ x: 0, y: 0 });
+  const didDrag = useRef(false);
+  const pokeTimer = useRef<number | undefined>(undefined);
+  const pokeInFlight = useRef(false);
+
+  const ordinal = (count: number) => {
+    const remainder = count % 100;
+    const suffix =
+      remainder >= 11 && remainder <= 13
+        ? "th"
+        : count % 10 === 1
+          ? "st"
+          : count % 10 === 2
+            ? "nd"
+            : count % 10 === 3
+              ? "rd"
+              : "th";
+
+    return `${count}${suffix}`;
+  };
+
+  const greetVisitor = () => {
+    const greetings = ["oh hey!", "hello there!", "you found me!", "hi!"];
+    let nextGreeting = Math.floor(Math.random() * greetings.length);
+
+    if (nextGreeting === lastGreeting.current) {
+      nextGreeting = (nextGreeting + 1) % greetings.length;
+    }
+
+    lastGreeting.current = nextGreeting;
+    setHoverMessage(greetings[nextGreeting]);
+  };
+
+  const pokeCreature = async () => {
+    if (didDrag.current) {
+      didDrag.current = false;
+      return;
+    }
+    if (pokeInFlight.current) return;
+
+    pokeInFlight.current = true;
+    setPokeMessage("ouch!");
+
+    const storedCount = Number.parseInt(
+      window.localStorage.getItem("creature-poke-count") ?? "0",
+      10,
+    );
+    const fallbackCount = Number.isNaN(storedCount) ? 1 : storedCount + 1;
+
+    try {
+      const response = await fetch("/api/poke", { method: "POST" });
+      if (!response.ok) throw new Error("Global counter unavailable");
+
+      const data = (await response.json()) as { count?: number };
+      if (typeof data.count !== "number") throw new Error("Invalid counter");
+
+      window.localStorage.setItem("creature-poke-count", String(data.count));
+      setPokeMessage(
+        `this is the ${ordinal(data.count)} time someone has poked me :(`,
+      );
+    } catch {
+      window.localStorage.setItem("creature-poke-count", String(fallbackCount));
+      setPokeMessage(
+        `this is the ${ordinal(fallbackCount)} time you've poked me :(`,
+      );
+    } finally {
+      pokeInFlight.current = false;
+      if (pokeTimer.current) window.clearTimeout(pokeTimer.current);
+      pokeTimer.current = window.setTimeout(() => setPokeMessage(null), 3200);
+    }
+  };
+
+  useEffect(() => {
+    const messages = [
+      "ouch!",
+      "hmm, interesting.",
+      "still scrolling?",
+      "nice choice!",
+      "almost there...",
+    ];
+    let messageIndex = 0;
+    let hideTimer: number | undefined;
+
+    const showMessage = () => {
+      setCreatureMessage(messages[messageIndex % messages.length]);
+      messageIndex += 1;
+      hideTimer = window.setTimeout(() => setCreatureMessage(null), 2400);
+    };
+
+    const firstMessage = window.setTimeout(showMessage, 3000);
+    const messageLoop = window.setInterval(showMessage, 12000);
+
+    return () => {
+      window.clearTimeout(firstMessage);
+      if (hideTimer) window.clearTimeout(hideTimer);
+      if (pokeTimer.current) window.clearTimeout(pokeTimer.current);
+      window.clearInterval(messageLoop);
+    };
+  }, []);
+
+  const startDragging = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const walker = walkerRef.current;
+    const track = trackRef.current;
+    if (!walker || !track) return;
+
+    const walkerBounds = walker.getBoundingClientRect();
+    const creature = walker.querySelector<HTMLElement>(".creature");
+    if (creature) {
+      const transform = window.getComputedStyle(creature).transform;
+      wasReturning.current =
+        transform !== "none" && new DOMMatrixReadOnly(transform).a < 0;
+    }
+    dragOffset.current = {
+      x: event.clientX - walkerBounds.left,
+      y: event.clientY - walkerBounds.top,
+    };
+    dragStart.current = { x: event.clientX, y: event.clientY };
+    didDrag.current = false;
+    isDragging.current = true;
+    walker.style.animation = "none";
+    walker.style.removeProperty("--creature-delay");
+    walker.style.position = "fixed";
+    walker.style.left = `${walkerBounds.left}px`;
+    walker.style.top = `${walkerBounds.top}px`;
+    walker.style.bottom = "auto";
+    walker.classList.add("is-dragging");
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const dragCreature = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!isDragging.current) return;
+    const walker = walkerRef.current;
+    if (!walker) return;
+
+    if (
+      Math.hypot(
+        event.clientX - dragStart.current.x,
+        event.clientY - dragStart.current.y,
+      ) > 5
+    ) {
+      didDrag.current = true;
+    }
+
+    const x = Math.min(
+      window.innerWidth - walker.offsetWidth,
+      Math.max(0, event.clientX - dragOffset.current.x),
+    );
+    const top = Math.min(
+      window.innerHeight - walker.offsetHeight,
+      Math.max(0, event.clientY - dragOffset.current.y),
+    );
+
+    walker.style.left = `${x}px`;
+    walker.style.top = `${top}px`;
+  };
+
+  const dropCreature = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+
+    const walker = walkerRef.current;
+    const track = trackRef.current;
+    if (!walker || !track) return;
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    walker.classList.remove("is-dragging");
+    walker.classList.add("is-dropping");
+    walker.style.top = `${window.innerHeight - walker.offsetHeight}px`;
+
+    window.setTimeout(() => {
+      const trackBounds = track.getBoundingClientRect();
+      const trackWidth = trackBounds.width;
+      const start = Math.min(72, Math.max(0, trackWidth - 52));
+      const end = Math.max(start + 1, trackWidth - 124);
+      const viewportX = Number.parseFloat(walker.style.left) || trackBounds.left + start;
+      const currentX = Math.min(end, Math.max(start, viewportX - trackBounds.left));
+      const horizontalProgress = (currentX - start) / (end - start);
+      const progress = wasReturning.current
+        ? 1 - 0.48 * horizontalProgress
+        : 0.48 * horizontalProgress;
+
+      walker.classList.remove("is-dropping");
+      walker.style.position = "";
+      walker.style.left = "";
+      walker.style.top = "";
+      walker.style.bottom = "";
+      walker.style.animation = "";
+      walker.style.setProperty("--creature-delay", `${-progress * 26}s`);
+    }, 1160);
+  };
+
   return (
     <footer className="site-footer">
       <div className="footer-identity">
@@ -52,6 +259,7 @@ export function Footer() {
           <span>Claudio Bakker</span>
         </div>
         <AmsterdamTime />
+        <p className="footer-credit">Designed + coded by Claudio</p>
       </div>
 
       <nav className="footer-navigation" aria-label="Footer navigation">
@@ -95,7 +303,35 @@ export function Footer() {
         </div>
       </div>
 
-      <p className="footer-credit">Designed + coded by Claudio</p>
+      <div ref={trackRef} className="creature-track">
+        <div
+          ref={walkerRef}
+          className="creature-walker"
+          role="img"
+          aria-label="A small walking creature"
+          onPointerDown={startDragging}
+          onPointerMove={dragCreature}
+          onPointerUp={dropCreature}
+          onPointerCancel={dropCreature}
+          onPointerEnter={greetVisitor}
+          onPointerLeave={() => setHoverMessage(null)}
+          onClick={pokeCreature}
+        >
+          <span
+            className={`creature-message${pokeMessage || hoverMessage || creatureMessage ? " is-visible" : ""}`}
+          >
+            {pokeMessage || hoverMessage || creatureMessage}
+          </span>
+          <div className="creature">
+            <span className="creature-body">
+              <span className="creature-eye creature-eye-left" />
+              <span className="creature-eye creature-eye-right" />
+            </span>
+            <span className="creature-leg creature-leg-one" />
+            <span className="creature-leg creature-leg-two" />
+          </div>
+        </div>
+      </div>
     </footer>
   );
 }
