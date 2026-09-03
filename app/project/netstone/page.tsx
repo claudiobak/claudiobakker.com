@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
 import Home from "../../page";
-import { NetstoneCaseStudyPage } from "../../netstone-case-study";
 
 export const metadata: Metadata = {
   title: "Netstone Security Portal | Claudio Bakker",
 };
 
 export default function NetstoneProjectPage() {
-  return (
-    <>
-      <Home />
-      <NetstoneCaseStudyPage />
-    </>
-  );
+  return <div className="case-background"><Home /></div>;
 }

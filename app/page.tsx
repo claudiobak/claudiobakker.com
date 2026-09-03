@@ -35,7 +35,7 @@ export default function Home() {
         <h1 id="hero-title">
           I’m Claudio, a product
           <br className="hero-title-break" />
-          designer who codes.
+          {" "}designer who codes.
         </h1>
         <div className="hero-copy">
           <div className="intro-copy">
@@ -65,7 +65,7 @@ export default function Home() {
                   <span className="contact-dot" />
                 </span>
                 <span className="contact-label">
-                  Building something exciting?{" "}
+                  <span className="contact-prompt">Building something exciting?{" "}</span>
                   <a href="mailto:claudiobakker@gmail.com" className="contact-link">
                     <strong>Let’s talk!</strong>
                   </a>

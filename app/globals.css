@@ -324,6 +324,8 @@ a { color: inherit; text-decoration: none; }
   place-items: center;
   padding: clamp(12px, 2vw, 28px);
   background: rgb(15 18 26 / 62%);
+  animation: case-overlay-in 320ms ease both;
+  transition: background-color 420ms ease;
 }
 .case-overlay.is-full-page {
   display: block;
@@ -339,7 +341,35 @@ a { color: inherit; text-decoration: none; }
   border-radius: 22px;
   background: #fbfbfc;
   box-shadow: 0 24px 80px rgb(15 19 28 / 28%);
-  transition: width 300ms ease, height 300ms ease, border-radius 300ms ease;
+  animation: case-modal-in 420ms cubic-bezier(.22, 1, .36, 1) both;
+  transform-origin: center bottom;
+  transition:
+    width 420ms cubic-bezier(.22, 1, .36, 1),
+    height 420ms cubic-bezier(.22, 1, .36, 1),
+    border-radius 420ms cubic-bezier(.22, 1, .36, 1),
+    box-shadow 420ms ease;
+}
+.case-overlay.is-closing { animation: case-overlay-out 280ms ease both; }
+.case-overlay.is-closing .case-modal {
+  animation: case-modal-out 280ms cubic-bezier(.4, 0, 1, 1) both;
+}
+.case-overlay.is-full-page,
+.case-overlay.is-full-page .case-modal { animation: none; }
+@keyframes case-overlay-in {
+  from { background-color: rgb(15 18 26 / 0%); }
+  to { background-color: rgb(15 18 26 / 62%); }
+}
+@keyframes case-overlay-out {
+  from { background-color: rgb(15 18 26 / 62%); }
+  to { background-color: rgb(15 18 26 / 0%); }
+}
+@keyframes case-modal-in {
+  from { opacity: 0; transform: translateY(28px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes case-modal-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(22px) scale(.99); }
 }
 .case-modal.is-expanded { width: 100vw; height: 100vh; border-radius: 0; }
 .case-overlay.is-full-page .case-modal {
@@ -364,14 +394,36 @@ a { color: inherit; text-decoration: none; }
 }
 .case-scroll::-webkit-scrollbar-thumb:hover { background-color: #99a5b9; }
 .case-scroll::-webkit-scrollbar-button {
+  display: none;
   width: 0;
   height: 0;
   background: transparent;
+  -webkit-appearance: none;
 }
-.case-scroll::-webkit-scrollbar-button:single-button {
+.case-scroll::-webkit-scrollbar-button:single-button,
+.case-scroll::-webkit-scrollbar-button:vertical:start:decrement,
+.case-scroll::-webkit-scrollbar-button:vertical:start:increment,
+.case-scroll::-webkit-scrollbar-button:vertical:end:decrement,
+.case-scroll::-webkit-scrollbar-button:vertical:end:increment {
   display: none;
-  background: #fbfbfc;
+  width: 0;
+  height: 0;
+  background: transparent;
+  -webkit-appearance: none;
 }
+.case-modal:not(.is-expanded)::before,
+.case-modal:not(.is-expanded)::after {
+  position: absolute;
+  right: 2px;
+  z-index: 2;
+  width: 14px;
+  height: 14px;
+  background: #fbfbfc;
+  content: "";
+  pointer-events: none;
+}
+.case-modal:not(.is-expanded)::before { top: 2px; }
+.case-modal:not(.is-expanded)::after { bottom: 2px; }
 .case-control {
   position: absolute;
   top: 20px;
@@ -400,17 +452,23 @@ a { color: inherit; text-decoration: none; }
 }
 .case-modal.is-expanded .case-header {
   display: flex;
-  min-height: 42px;
+  min-height: 56px;
   padding-right: clamp(24px, 6vw, 96px);
   padding-left: clamp(24px, 6vw, 96px);
 }
-.case-modal.is-expanded .case-header > img {
+.case-project-logo { display: inline-flex; }
+.case-modal.is-expanded .case-project-logo {
   position: fixed;
   top: 20px;
   left: clamp(24px, 6vw, 96px);
   z-index: 4;
+  display: inline-flex;
 }
-.case-modal.is-expanded .case-header > p { margin-left: 60px; }
+.case-project-logo img { display: block; width: 57px; height: 56px; }
+.case-modal.is-expanded .case-header > p {
+  height: 56px;
+  margin-left: 75px;
+}
 .case-header p { display: flex; align-items: center; gap: 9px; margin: 0; }
 .case-header p > a { color: var(--muted); transition: color 180ms ease; }
 .case-header p > a:hover { color: var(--link-hover); }
@@ -424,12 +482,11 @@ a { color: inherit; text-decoration: none; }
   padding: clamp(56px, 7vw, 84px) clamp(24px, 6vw, 72px) 96px;
 }
 .case-modal.is-expanded .case-layout {
-  grid-template-columns: minmax(150px, 220px) minmax(0, 880px);
-  gap: clamp(40px, 7vw, 120px);
+  grid-template-columns: minmax(120px, 1fr) minmax(0, 880px) minmax(120px, 1fr);
+  gap: clamp(20px, 3vw, 48px);
   padding: clamp(64px, 8vw, 112px) clamp(24px, 6vw, 96px) 120px;
-  justify-content: start;
 }
-.case-chapters { position: sticky; top: 84px; align-self: start; display: none; flex-direction: column; gap: 12px; }
+.case-chapters { position: sticky; top: 112px; align-self: start; display: none; flex-direction: column; gap: 12px; }
 .case-modal.is-expanded .case-chapters { display: flex; }
 .case-full-footer {
   padding: 0 clamp(24px, 6vw, 96px);
@@ -438,6 +495,18 @@ a { color: inherit; text-decoration: none; }
 .case-chapters a:hover { color: var(--link-hover); }
 .case-chapters a.is-active { color: var(--link-hover); }
 .case-content { min-width: 0; }
+.has-scroll-reveals .case-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 520ms ease,
+    transform 620ms cubic-bezier(.22, 1, .36, 1);
+  will-change: opacity, transform;
+}
+.has-scroll-reveals .case-reveal.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
 .case-intro > img { margin-bottom: 28px; }
 .case-intro h1 { margin: 0; font-size: clamp(34px, 4.5vw, 64px); font-weight: 500; letter-spacing: -.045em; line-height: 1; }
 .case-intro > p { max-width: 650px; margin: 22px 0 0; color: var(--muted); font-size: clamp(18px, 1.7vw, 24px); line-height: 1.35; }
@@ -548,6 +617,13 @@ a { color: inherit; text-decoration: none; }
   opacity: 1;
   transform: translateY(0);
 }
+.case-background .project-trigger .project-cover {
+  animation: project-hover-release 420ms cubic-bezier(.22, 1, .36, 1) both;
+}
+@keyframes project-hover-release {
+  from { transform: scale(.993); }
+  to { transform: scale(1); }
+}
 .holding-page { padding-top: clamp(112px, 15vw, 224px); }
 
 .about-intro {
@@ -572,7 +648,7 @@ a { color: inherit; text-decoration: none; }
     var(--column-gap)
     calc((100% - var(--column-gap)) / 2);
   row-gap: 0;
-  padding: 42px 0 0;
+  padding: 42px 0 clamp(72px, 7vw, 112px);
 }
 .about-section-nav {
   position: sticky;
@@ -1075,6 +1151,7 @@ a { color: inherit; text-decoration: none; }
     line-height: 1.02;
   }
   .hero-title-break { display: none; }
+  .contact-prompt { display: none; }
   .holding-page { gap: 20px; }
   .project-grid { grid-template-columns: 1fr; gap: 44px; }
   .project-card { padding-bottom: 0; }
@@ -1091,7 +1168,7 @@ a { color: inherit; text-decoration: none; }
   .case-expand { display: none; }
   .case-header { padding: 18px 72px 18px 20px; }
   .case-modal .case-header { display: flex; }
-  .case-header > img { display: none; }
+  .case-header > .case-project-logo { display: none; }
   .case-layout { grid-template-columns: 1fr; gap: 0; padding: 52px 24px 88px; }
   .case-chapters { display: none; }
   .case-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 48px; }
@@ -1224,6 +1301,16 @@ a { color: inherit; text-decoration: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .navigation-indicator { transition: none; }
+  .case-overlay,
+  .case-overlay .case-modal,
+  .case-background .project-trigger .project-cover { animation-duration: 1ms; }
+  .case-overlay,
+  .case-overlay .case-modal { transition: none; }
+  .has-scroll-reveals .case-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
   .contact-halo { animation: none; }
   .contact-label, .copy-text { transition: none; }
   .project-cover, .project-description { transition: none; }
