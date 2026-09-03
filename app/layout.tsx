@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Figtree } from "next/font/google";
+import Image from "next/image";
 import Link from "next/link";
 import { CustomCursor } from "./custom-cursor";
 import { Footer } from "./footer";
@@ -21,7 +22,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <div className="site-shell">
           <header className="site-header">
             <Link href="/" className="logo-link" aria-label="Claudio Bakker — home">
-              <img src="/logo-claudio.svg" alt="" width="57" height="56" />
+              <Image
+                src="/logo-claudio.svg"
+                alt=""
+                width={57}
+                height={56}
+                priority
+                unoptimized
+              />
             </Link>
             <Navigation />
           </header>

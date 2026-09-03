@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import {
   useEffect,
   useRef,
@@ -324,11 +325,12 @@ export function Footer() {
 
     walker.classList.remove("is-dragging");
     walker.classList.add("is-dropping");
-    walker.style.top = `${window.innerHeight - walker.offsetHeight}px`;
+    const trackBounds = track.getBoundingClientRect();
+    walker.style.top = `${trackBounds.bottom - walker.offsetHeight}px`;
 
     window.setTimeout(() => {
-      const trackBounds = track.getBoundingClientRect();
-      const trackWidth = trackBounds.width;
+      const settledTrackBounds = track.getBoundingClientRect();
+      const trackWidth = settledTrackBounds.width;
       const isVerySmallScreen = window.matchMedia("(max-width: 480px)").matches;
       const sideInset = isVerySmallScreen ? 8 : 72;
       const start = Math.min(
@@ -339,8 +341,12 @@ export function Footer() {
         start + 1,
         trackWidth - walker.offsetWidth - sideInset,
       );
-      const viewportX = Number.parseFloat(walker.style.left) || trackBounds.left + start;
-      const currentX = Math.min(end, Math.max(start, viewportX - trackBounds.left));
+      const viewportX =
+        Number.parseFloat(walker.style.left) || settledTrackBounds.left + start;
+      const currentX = Math.min(
+        end,
+        Math.max(start, viewportX - settledTrackBounds.left),
+      );
       const horizontalProgress = (currentX - start) / (end - start);
       const progress = wasReturning.current
         ? 1 - 0.48 * horizontalProgress
@@ -415,62 +421,6 @@ export function Footer() {
 
   return (
     <footer className="site-footer">
-      <div className="footer-identity">
-        <div className="footer-name">
-          <img src="/logo-claudio.svg" alt="" width="32" height="32" />
-          <span>Claudio Bakker</span>
-        </div>
-        <AmsterdamTime />
-        <p className="footer-credit">Designed + coded by Claudio</p>
-      </div>
-
-      <nav className="footer-navigation" aria-label="Footer navigation">
-        <Link href="/">Work</Link>
-        <Link href="/about">About</Link>
-        <a
-          href="/Claudio-Bakker-CV.pdf"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Resume
-        </a>
-      </nav>
-
-      <div className="footer-contact">
-        <p>Let&apos;s work together!</p>
-        <a
-          href={`mailto:${email}`}
-          className="copy-email"
-        >
-          <span>{email}</span>
-          <svg
-            className="email-arrow"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path d="M7 17 17 7M8 7h9v9" />
-          </svg>
-        </a>
-        <div className="social-links">
-          <a
-            href="https://www.linkedin.com/in/claudiobakker/"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="LinkedIn"
-          >
-            <LinkedInIcon />
-          </a>
-          <a
-            href="https://github.com/claudiobak"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="GitHub"
-          >
-            <GitHubIcon />
-          </a>
-        </div>
-      </div>
-
       <div ref={trackRef} className="creature-track">
         <div
           ref={walkerRef}
@@ -497,6 +447,70 @@ export function Footer() {
             </span>
             <span className="creature-leg creature-leg-one" />
             <span className="creature-leg creature-leg-two" />
+          </div>
+        </div>
+      </div>
+
+      <div className="footer-content">
+        <div className="footer-identity">
+          <div className="footer-name">
+            <Image
+              src="/logo-claudio.svg"
+              alt=""
+              width={32}
+              height={32}
+              unoptimized
+            />
+            <span>Claudio Bakker</span>
+          </div>
+          <AmsterdamTime />
+          <p className="footer-credit">Designed + coded by Claudio</p>
+        </div>
+
+        <nav className="footer-navigation" aria-label="Footer navigation">
+          <Link href="/">Work</Link>
+          <Link href="/about">About</Link>
+          <a
+            href="/Claudio-Bakker-CV.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Resume
+          </a>
+        </nav>
+
+        <div className="footer-contact">
+          <p>Let&apos;s work together!</p>
+          <a
+            href={`mailto:${email}`}
+            className="copy-email"
+          >
+            <span>{email}</span>
+            <svg
+              className="email-arrow"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path d="M7 17 17 7M8 7h9v9" />
+            </svg>
+          </a>
+          <div className="social-links">
+            <a
+              href="https://www.linkedin.com/in/claudiobakker/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="LinkedIn"
+            >
+              <LinkedInIcon />
+            </a>
+            <a
+              href="https://github.com/claudiobak"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="GitHub"
+            >
+              <GitHubIcon />
+            </a>
           </div>
         </div>
       </div>
