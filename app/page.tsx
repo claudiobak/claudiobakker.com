@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { NetstoneCaseStudy } from "./netstone-case-study";
 
 const projects = [
   {
@@ -77,7 +78,7 @@ export default function Home() {
       <section className="projects" aria-label="Selected work">
         <div className="project-grid">
           {projects.map((project, index) => (
-            <article className="project-card" key={project.company}>
+            index === 0 ? <NetstoneCaseStudy key={project.company}><article className="project-card">
               <div className="project-cover">
                 <Image
                   src={project.image}
@@ -94,6 +95,8 @@ export default function Home() {
                 </p>
               </div>
               <p className="project-description">{project.description}</p>
+            </article></NetstoneCaseStudy> : <article className="project-card" key={project.company}>
+              <div className="project-cover"><Image src={project.image} alt={`${project.company} project cover`} width={678} height={368} sizes="(max-width: 720px) 100vw, 50vw" unoptimized /><p className="project-label"><span>{project.company}</span><span className="project-meta"> · {project.year}</span></p></div><p className="project-description">{project.description}</p>
             </article>
           ))}
         </div>

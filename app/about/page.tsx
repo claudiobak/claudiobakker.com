@@ -33,7 +33,7 @@ export default function AboutPage() {
 
         <section className="about-section about-hello">
           <div className="about-portrait">
-            <Image src="/portrait-claudio.jpg" alt="Claudio Bakker at the Louvre" width={272} height={350} sizes="(max-width: 720px) 70vw, 272px" unoptimized />
+            <Image src="/portrait-claudio.jpg" alt="Claudio Bakker at the Louvre" width={272} height={350} sizes="(max-width: 720px) 70vw, 272px" />
           </div>
           <div id="hello" className="about-copy">
             <h2>A little more about me</h2>
@@ -73,7 +73,15 @@ export default function AboutPage() {
             <div className="client-list">
               {freelanceClients.map((client) => (
                 <div className="client" key={client.name}>
-                  <span className="company-logo"><img src={client.logo} alt="" /></span>
+                  <span className="company-logo">
+                    <Image
+                      src={client.logo}
+                      alt=""
+                      width={50}
+                      height={50}
+                      unoptimized
+                    />
+                  </span>
                   <span>{client.name}</span>
                 </div>
               ))}
@@ -81,7 +89,15 @@ export default function AboutPage() {
             <div className="role-list">
               {roles.map((role) => (
                 <div className="role" key={role.company}>
-                  <span className="company-logo"><img src={role.logo} alt="" /></span>
+                  <span className="company-logo">
+                    <Image
+                      src={role.logo}
+                      alt=""
+                      width={50}
+                      height={50}
+                      unoptimized
+                    />
+                  </span>
                   <div>
                     <h4>{role.company}</h4>
                     <p>{role.title}, <span>{role.year}</span></p>
