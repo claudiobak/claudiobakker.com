@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { JamtimeCaseStudy } from "./jamtime-case-study";
 import { NetstoneCaseStudy } from "./netstone-case-study";
 
 const projects = [
@@ -9,16 +10,16 @@ const projects = [
     description: "Making cybersecurity data clear and actionable.",
   },
   {
+    company: "Jamtime",
+    year: "2024–2026",
+    image: "/project-3-cover.jpg",
+    description: "Helping musicians connect and create together.",
+  },
+  {
     company: "Cyrrus",
     year: "2025",
     image: "/project-2-cover.jpg",
     description: "Making complex workflows feel simple and intuitive.",
-  },
-  {
-    company: "JamPoint",
-    year: "2025",
-    image: "/project-3-cover.jpg",
-    description: "Helping musicians connect and create together.",
   },
   {
     company: "Onix",
@@ -27,6 +28,18 @@ const projects = [
     description: "Making every digital interaction feel clear.",
   },
 ];
+
+function ProjectCard({ project, priority = false }: { project: (typeof projects)[number]; priority?: boolean }) {
+  return (
+    <article className="project-card">
+      <div className="project-cover">
+        <Image src={project.image} alt={`${project.company} project cover`} width={678} height={368} sizes="(max-width: 720px) 100vw, 50vw" priority={priority} unoptimized />
+        <p className="project-label"><span>{project.company}</span><span className="project-meta"> • {project.year}</span></p>
+      </div>
+      <p className="project-description">{project.description}</p>
+    </article>
+  );
+}
 
 export default function Home() {
   return (
@@ -77,28 +90,12 @@ export default function Home() {
       </section>
       <section className="projects" aria-label="Selected work">
         <div className="project-grid">
-          {projects.map((project, index) => (
-            index === 0 ? <NetstoneCaseStudy key={project.company}><article className="project-card">
-              <div className="project-cover">
-                <Image
-                  src={project.image}
-                  alt={`${project.company} project cover`}
-                  width={678}
-                  height={368}
-                  sizes="(max-width: 720px) 100vw, 50vw"
-                  priority={index === 0}
-                  unoptimized
-                />
-                <p className="project-label">
-                  <span>{project.company}</span>
-                  <span className="project-meta"> • {project.year}</span>
-                </p>
-              </div>
-              <p className="project-description">{project.description}</p>
-            </article></NetstoneCaseStudy> : <article className="project-card" key={project.company}>
-              <div className="project-cover"><Image src={project.image} alt={`${project.company} project cover`} width={678} height={368} sizes="(max-width: 720px) 100vw, 50vw" unoptimized /><p className="project-label"><span>{project.company}</span><span className="project-meta"> · {project.year}</span></p></div><p className="project-description">{project.description}</p>
-            </article>
-          ))}
+          {projects.map((project, index) => {
+            const card = <ProjectCard project={project} priority={index === 0} />;
+            if (index === 0) return <NetstoneCaseStudy key={project.company}>{card}</NetstoneCaseStudy>;
+            if (project.company === "Jamtime") return <JamtimeCaseStudy key={project.company}>{card}</JamtimeCaseStudy>;
+            return <ProjectCard key={project.company} project={project} />;
+          })}
         </div>
       </section>
     </main>

@@ -6,5 +6,5 @@ export const metadata: Metadata = {
 };
 
 export default function NetstoneProjectPage() {
-  return <div className="case-background"><Home /></div>;
+  return <div className="case-background case-background-netstone"><Home /></div>;
 }
