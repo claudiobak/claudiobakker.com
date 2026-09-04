@@ -466,8 +466,12 @@ a { color: inherit; text-decoration: none; }
 }
 .case-project-logo img { display: block; width: 57px; height: 56px; }
 .case-modal.is-expanded .case-header > p {
+  position: fixed;
+  top: 20px;
+  left: calc(clamp(24px, 6vw, 96px) + 75px);
+  z-index: 4;
   height: 56px;
-  margin-left: 75px;
+  margin-left: 0;
 }
 .case-header p { display: flex; align-items: center; gap: 9px; margin: 0; }
 .case-header p > a { color: var(--muted); transition: color 180ms ease; }
@@ -486,7 +490,7 @@ a { color: inherit; text-decoration: none; }
   gap: clamp(20px, 3vw, 48px);
   padding: clamp(64px, 8vw, 112px) clamp(24px, 6vw, 96px) 120px;
 }
-.case-chapters { position: sticky; top: 112px; align-self: start; display: none; flex-direction: column; gap: 12px; }
+.case-chapters { position: sticky; top: 112px; align-self: start; display: none; flex-direction: column; align-items: flex-start; gap: 12px; }
 .case-modal.is-expanded .case-chapters { display: flex; }
 .case-full-footer {
   padding: 0 clamp(24px, 6vw, 96px);
@@ -1169,6 +1173,7 @@ a { color: inherit; text-decoration: none; }
   .case-header { padding: 18px 72px 18px 20px; }
   .case-modal .case-header { display: flex; }
   .case-header > .case-project-logo { display: none; }
+  .case-modal.is-expanded .case-header > p { display: none; }
   .case-layout { grid-template-columns: 1fr; gap: 0; padding: 52px 24px 88px; }
   .case-chapters { display: none; }
   .case-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 48px; }

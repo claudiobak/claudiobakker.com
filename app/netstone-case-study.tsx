@@ -24,7 +24,25 @@ function Visual({ label }: { label: string }) {
 }
 
 export function NetstoneCaseStudy({ children }: { children: ReactNode }) {
-  return <Link className="project-trigger" href="/project/netstone" scroll={false}>{children}</Link>;
+  const [openFullPage, setOpenFullPage] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 720px)");
+    const updateDestination = () => setOpenFullPage(mediaQuery.matches);
+    updateDestination();
+    mediaQuery.addEventListener("change", updateDestination);
+    return () => mediaQuery.removeEventListener("change", updateDestination);
+  }, []);
+
+  return (
+    <Link
+      className="project-trigger"
+      href={openFullPage ? "/project/netstone/full" : "/project/netstone"}
+      scroll={false}
+    >
+      {children}
+    </Link>
+  );
 }
 
 export function NetstoneCaseStudyRoute({ children }: { children: ReactNode }) {

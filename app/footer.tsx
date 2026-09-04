@@ -471,7 +471,7 @@ export function Footer() {
           <Link href="/">Work</Link>
           <Link href="/about">About</Link>
           <a
-            href="/Claudio-Bakker-CV.pdf"
+            href="/Claudio_Bakker_CV.pdf"
             target="_blank"
             rel="noopener noreferrer"
           >
