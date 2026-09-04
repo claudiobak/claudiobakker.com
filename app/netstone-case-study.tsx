@@ -16,7 +16,7 @@ const chapters = [
 
 const relatedProjects = [
   { company: "Cyrrus", year: "2025", image: "/project-2-cover.jpg" },
-  { company: "JamPoint", year: "2025", image: "/project-3-cover.jpg" },
+  { company: "Jamtime", year: "2024–2026", image: "/project-3-cover.jpg" },
 ];
 
 function Visual({ label }: { label: string }) {
@@ -36,7 +36,7 @@ export function NetstoneCaseStudy({ children }: { children: ReactNode }) {
 
   return (
     <Link
-      className="project-trigger"
+      className="project-trigger project-trigger-netstone"
       href={openFullPage ? "/project/netstone/full" : "/project/netstone"}
       scroll={false}
     >
