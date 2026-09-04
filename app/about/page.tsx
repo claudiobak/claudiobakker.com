@@ -19,7 +19,7 @@ export default function AboutPage() {
         <h1 id="about-title">
           I’m Claudio, a product
           <br className="hero-title-break" />
-          designer who codes.
+          {" "}designer who codes.
         </h1>
         <p className="about-intro">
           Product designer, UX/UI designer, Front-end developer &amp;
