@@ -162,7 +162,6 @@ function NetstoneCaseStudyPage({ full = false }: { full?: boolean }) {
             {!full && <button className="case-control case-close" type="button" onClick={closeModal} aria-label="Close case study">
               <CloseIcon />
             </button>}
-
             <div ref={scrollRef} className="case-scroll" onScroll={updateActiveChapter}>
               <header className="case-header">
                 <Link className="case-project-logo" href="/project/netstone" scroll={false} aria-label="Return to project modal">
