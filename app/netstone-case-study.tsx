@@ -16,7 +16,7 @@ const chapters = [
 
 const relatedProjects = [
   { company: "Cyrrus", year: "2025", image: "/project-2-cover.jpg" },
-  { company: "Jamtime", year: "2024–2026", image: "/project-3-cover.jpg" },
+  { company: "Jamtime", year: "2024–2026", image: "/project-3-cover.jpg", href: "/project/jamtime" },
 ];
 
 function Visual({ label }: { label: string }) {
@@ -228,8 +228,8 @@ function NetstoneCaseStudyPage({ full = false }: { full?: boolean }) {
                   <section className="case-related" aria-labelledby="case-related-title">
                     <h2 id="case-related-title">Also check out...</h2>
                     <div className="case-related-grid">
-                      {relatedProjects.map((project) => (
-                        <article className="case-related-card" key={project.company}>
+                      {relatedProjects.map((project) => {
+                        const card = <>
                           <Image
                             src={project.image}
                             alt={`${project.company} project cover`}
@@ -242,8 +242,24 @@ function NetstoneCaseStudyPage({ full = false }: { full?: boolean }) {
                             <span>{project.company}</span>
                             <span> · {project.year}</span>
                           </p>
-                        </article>
-                      ))}
+                        </>;
+
+                        return project.href ? (
+                          <Link
+                            className="case-related-card"
+                            href={project.href}
+                            scroll={false}
+                            key={project.company}
+                            onClick={(event) => {
+                              if (!window.matchMedia("(max-width: 720px)").matches) return;
+                              event.preventDefault();
+                              router.push(`${project.href}/full`, { scroll: false });
+                            }}
+                          >
+                            {card}
+                          </Link>
+                        ) : <article className="case-related-card" key={project.company}>{card}</article>;
+                      })}
                     </div>
                   </section>
                 </article>
