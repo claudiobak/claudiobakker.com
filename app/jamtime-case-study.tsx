@@ -203,7 +203,21 @@ function JamtimeCaseStudyPage({ full }: { full: boolean }) {
                 <div className="case-related-grid">
                   {relatedProjects.map((project) => {
                     const card = <><Image src={project.image} alt={`${project.company} project cover`} width={678} height={368} sizes="(max-width: 900px) 100vw, 50vw" unoptimized /><p><span>{project.company}</span><span> · {project.year}</span></p></>;
-                    return project.href ? <Link className="case-related-card" href={project.href} scroll={false} key={project.company}>{card}</Link> : <article className="case-related-card" key={project.company}>{card}</article>;
+                    return project.href ? (
+                      <Link
+                        className="case-related-card"
+                        href={project.href}
+                        scroll={false}
+                        key={project.company}
+                        onClick={(event) => {
+                          if (!window.matchMedia("(max-width: 720px)").matches) return;
+                          event.preventDefault();
+                          router.push(`${project.href}/full`, { scroll: false });
+                        }}
+                      >
+                        {card}
+                      </Link>
+                    ) : <article className="case-related-card" key={project.company}>{card}</article>;
                   })}
                 </div>
               </section>
