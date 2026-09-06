@@ -117,7 +117,6 @@ function JamtimeCaseStudyPage({ full }: { full: boolean }) {
       <section className={`case-modal${full ? " is-expanded" : ""}`} role={full ? undefined : "dialog"} aria-modal={full ? undefined : "true"} aria-labelledby="jamtime-case-title">
         {!full && <Link className="case-control case-expand" href="/project/jamtime/full" scroll={false} aria-label="Open full case study"><ExpandIcon /></Link>}
         {!full && <button className="case-control case-close" type="button" onClick={closeModal} aria-label="Close case study"><CloseIcon /></button>}
-
         <div ref={scrollRef} className="case-scroll" onScroll={updateActiveChapter}>
           <header className="case-header">
             <Link className="case-project-logo" href="/project/jamtime" scroll={false} aria-label="Return to project modal">
