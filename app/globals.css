@@ -471,6 +471,15 @@ a { color: inherit; text-decoration: none; }
 .case-header p > a:hover { color: var(--link-hover); }
 .case-header p strong { font-weight: 500; }
 .case-header p svg { width: 14px; fill: none; stroke: var(--muted); stroke-width: 1.7; }
+@media (min-width: 721px) {
+  .case-modal.is-expanded .case-project-logo {
+    position: fixed;
+    top: 20px;
+    left: clamp(24px, 6vw, 96px);
+    z-index: 4;
+  }
+  .case-modal.is-expanded .case-header > p { margin-left: 75px; }
+}
 .case-layout {
   display: grid;
   grid-template-columns: minmax(0, 820px);
