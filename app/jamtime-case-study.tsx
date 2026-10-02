@@ -149,7 +149,17 @@ function JamtimeCaseStudyPage({ full }: { full: boolean }) {
                 <p>What started as a concept for a digital musician bulletin board evolved into a complete platform combining <strong>musician discovery, profiles, posts, advertisements and messaging</strong> in one experience.</p>
                 <Sub title="1.1 Challenge"><p>Musicians already use social media, forums and musician-specific platforms to find people to play with. The problem is that these experiences often provide limited ways to determine whether someone is actually a good fit.</p><p>Instrument, genre, location, experience and musical interests can all influence whether two musicians want to play together.</p><p>The challenge was to make finding and approaching potential collaborators <strong>more relevant, trustworthy and approachable.</strong></p></Sub>
                 <Sub title="1.2 Opportunity"><p>Rather than creating another listing website, Jamtime could provide a space built around a musician&apos;s identity and the process of connecting with others.</p><p>The goal was to bring <strong>discovery, social interaction and communication</strong> together so musicians could go from finding someone interesting to starting a conversation without relying on several different platforms.</p></Sub>
-                <Sub title="1.3 Highlights"><h4>Discover musicians that fit</h4><p>Search, filters and personalized feeds help users discover musicians based on factors such as instrument, genre, location and experience.</p><Visual label="Video · Homepage, filters and musician profile" /><h4>Build your musical identity</h4><p>Profiles bring together instruments, genres, experience, personal information and media so musicians can understand who they&apos;re connecting with.</p><Visual label="Video · Musician profile, instruments, genres and media" /><h4>From discovery to conversation</h4><p>Posts, advertisements and messaging let musicians discover opportunities and contact each other within the same platform.</p><Visual label="Video · Advertisement, profile, message and conversation" /></Sub>
+                <Sub title="1.3 Highlights">
+                  <h4>Discover musicians that fit</h4>
+                  <p>Search, filters and personalized feeds help users discover musicians based on factors such as instrument, genre, location and experience.</p>
+                  <Image className="case-highlight-image" src="/jamtime-highlight-discovery.jpg" alt="Jamtime musician advertisements on mobile and desktop" width={1393} height={794} sizes="(max-width: 900px) 100vw, 880px" />
+                  <h4>Build your musical identity</h4>
+                  <p>Profiles bring together instruments, genres, experience, personal information and media so musicians can understand who they&apos;re connecting with.</p>
+                  <Image className="case-highlight-image" src="/jamtime-highlight-identity.jpg" alt="Jamtime advertisement creation and musician profile screens" width={1393} height={794} sizes="(max-width: 900px) 100vw, 880px" />
+                  <h4>From discovery to conversation</h4>
+                  <p>Posts, advertisements and messaging let musicians discover opportunities and contact each other within the same platform.</p>
+                  <Image className="case-highlight-image" src="/jamtime-highlight-conversation.jpg" alt="Jamtime advertisement, conversation and notification screens" width={1393} height={794} sizes="(max-width: 900px) 100vw, 880px" />
+                </Sub>
               </CaseSection>
 
               <CaseSection id="problem" number="2." title="Understanding the Problem">
